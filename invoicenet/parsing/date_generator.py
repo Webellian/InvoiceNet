@@ -29,52 +29,58 @@ months = list(range(1, 13))
 days = list(range(1, 32))
 
 year_formats = ['%y', '%Y']
-month_formats = ['%m', '%b', '%B']
+# month_formats = ['%m', '%b', '%B']
+month_formats = ['%m']
 day_formats = ['%d']
 
+# date_formats = [
+#     'day/month/year',
+#     'month/day/year',
+#     'year/month/day',
+#     'month/year/day',
+#     'year/day/month',
+#     'day/year/month',
+#     'day-month-year',
+#     'month-day-year',
+#     'year-month-day',
+#     'month-year-day',
+#     'year-day-month',
+#     'day-year-month',
+#     'day.month.year',
+#     'month.day.year',
+#     'year.month.day',
+#     'month.year.day',
+#     'year.day.month',
+#     'day.year.month',
+#     'day,month,year',
+#     'month,day,year',
+#     'year,month,day',
+#     'month,year,day',
+#     'year,day,month',
+#     'day,year,month',
+#     'day.month,year',
+#     'day,month.year',
+#     'month.day,year',
+#     'month,day.year',
+#     'month.day,year',
+#     'day\\month\\year',
+#     'month\\day\\year',
+#     'year\\month\\day',
+#     'month\\year\\day',
+#     'year\\day\\month',
+#     'day\\year\\month',
+#     'day month, year',
+#     'month day, year',
+#     'year, month day',
+#     'year, day month',
+#     'year day month',
+#     'day month year',
+#     'month day year'
+# ]
 date_formats = [
-    'day/month/year',
-    'month/day/year',
-    'year/month/day',
-    'month/year/day',
-    'year/day/month',
-    'day/year/month',
-    'day-month-year',
-    'month-day-year',
-    'year-month-day',
-    'month-year-day',
-    'year-day-month',
-    'day-year-month',
     'day.month.year',
-    'month.day.year',
-    'year.month.day',
-    'month.year.day',
-    'year.day.month',
-    'day.year.month',
-    'day,month,year',
-    'month,day,year',
-    'year,month,day',
-    'month,year,day',
-    'year,day,month',
-    'day,year,month',
-    'day.month,year',
-    'day,month.year',
-    'month.day,year',
-    'month,day.year',
-    'month.day,year',
-    'day\\month\\year',
-    'month\\day\\year',
-    'year\\month\\day',
-    'month\\year\\day',
-    'year\\day\\month',
-    'day\\year\\month',
-    'day month, year',
-    'month day, year',
-    'year, month day',
-    'year, day month',
-    'year day month',
     'day month year',
-    'month day year'
+    'day-month-year'
 ]
 
 
@@ -121,7 +127,7 @@ def main():
             fp.write(date.strftime(
                 sample[0].replace('year', sample[1]).replace('month', sample[2]).replace('day', sample[3])))
             fp.write('\t')
-            fp.write(date.strftime('%m-%d-%Y'))
+            fp.write(date.strftime('%d.%m.%Y'))
             fp.write('\n')
 
     with open(os.path.join("data", "date", "valid.tsv"), "w") as fp:
@@ -139,7 +145,7 @@ def main():
             fp.write(date.strftime(
                 sample[0].replace('year', sample[1]).replace('month', sample[2]).replace('day', sample[3])))
             fp.write('\t')
-            fp.write(date.strftime('%m-%d-%Y'))
+            fp.write(date.strftime('%d.%m.%Y'))
             fp.write('\n')
 
 
