@@ -6,6 +6,7 @@ invoicenet/parsing/data/
 */__pycache__/*
 env/
 data/
+models/invoicenet/
 predictions/
 processed_data/
 invoices/

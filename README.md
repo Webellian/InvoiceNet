@@ -164,7 +164,21 @@ You can do so by setting the **Data Folder** field to the directory containing y
 Once the data is prepared, you can start training by clicking the **Start** button.
 
 
+---
 ## Using the CLI
+
+### Retrain parsers
+Optional step in case any changes to parsers are made. Any model using those parsers should be trained as well.
+```
+cd invoicenet/parsing
+python amount_generator.py
+python date_generator.py
+cd ../..
+python train_parser.py --field amount --batch_size 8 --steps 2000 --early_stop_steps 200
+python train_parser.py --field date --batch_size 8 --steps 2000 --early_stop_steps 200
+```
+
+---
 
 ### Training 
 

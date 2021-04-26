@@ -35,8 +35,3 @@ FIELDS["invoice_date"] = FIELD_TYPES["date"]
 FIELDS["net_amount"] = FIELD_TYPES["amount"]
 FIELDS["tax_amount"] = FIELD_TYPES["amount"]
 FIELDS["total_amount"] = FIELD_TYPES["amount"]
-
-# ToDo:
-# Kundennummer
-# Auftragsnummer
-# Bestellnummer vs Rechnungssnummer
