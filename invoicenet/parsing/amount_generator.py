@@ -51,28 +51,28 @@ def main():
 
                 if random.sample(range(1, 10000), 1)[0] % 20 == 0:
                     if random.sample(range(1, 10000), 1)[0] % 10 == 0:
-                        fp.write(str(number) + "\t" + str(number) + ".00" + "\n")
+                        fp.write(str(number) + "\t" + str(number) + ",00" + "\n")
                     else:
                         exp = "{}".format(random.sample(range(0, 100), 1)[0])
                         if len(exp) == 1:
                             exp = "0" + exp
-                        fp.write(str(number) + "." + exp + "\t" + str(number) + "." + exp + "\n")
+                        fp.write(str(number) + "." + exp + "\t" + str(number) + "," + exp + "\n")
 
                 else:
                     fnum = str(number)
-                    if len(fnum) > 3:
-                        fnum = fnum[:-3] + "," + fnum[-3:]
-                        if len(fnum) == 7:
-                            if random.sample(range(1, 10000), 1)[0] % 2 == 0:
-                                fnum = fnum[0] + ',' + fnum[1:]
+                    # if len(fnum) > 3:
+                    #     fnum = fnum[:-3] + "," + fnum[-3:]
+                    #     if len(fnum) == 7:
+                    #         if random.sample(range(1, 10000), 1)[0] % 2 == 0:
+                    #             fnum = fnum[0] + ',' + fnum[1:]
 
                     if random.sample(range(1, 10000), 1)[0] % 20 == 0:
-                        fp.write(fnum + "\t" + str(number) + ".00" + "\n")
+                        fp.write(fnum + "\t" + str(number) + ",00" + "\n")
                     else:
                         exp = "{}".format(random.sample(range(0, 100), 1)[0])
                         if len(exp) == 1:
                             exp = "0" + exp
-                        fp.write(fnum + "." + exp + "\t" + str(number) + "." + exp + "\n")
+                        fp.write(fnum + "," + exp + "\t" + str(number) + "," + exp + "\n")
 
 
 if __name__ == '__main__':
