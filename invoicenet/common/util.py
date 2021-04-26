@@ -28,18 +28,20 @@ import pytesseract
 from pytesseract import Output
 
 
+dateformat = '%Y-%m-%d'
+
 class TextParser:
 
     def __init__(self):
         self.template = dict()
-        self.template['amount'] = [r'\d+[,\d]*\.\d+']
+        self.template['amount'] = [r'\d+[ ,\d]*[,\.]\d+']
         self.template['date'] = [r'\d{1,2}[\/\\\.\,-]\d{1,2}[\/\\\.\,-]\d{2,4}',
                                  r'\d{2,4}[\/\\\.\,-]\d{1,2}[\/\\\.\,-]\d{1,2}']
 
     def parse(self, text, key):
         if key == 'date':
             try:
-                matches = [date for date in datefinder.find_dates(text) if date <= datetime.datetime.today()]
+                matches = [date for date in datefinder.find_dates(text)]
                 if matches:
                     return True
                 else:
@@ -56,9 +58,9 @@ class TextParser:
     def find(self, text, key):
         if key == 'date':
             try:
-                matches = [date for date in datefinder.find_dates(text) if date <= datetime.datetime.today()]
+                matches = [date for date in datefinder.find_dates(text)]
                 if len(matches) > 0:
-                    return [match.strftime('%m-%d-%Y') for match in matches]
+                    return [match.strftime(dateformat) for match in matches]
                 else:
                     return []
             except Exception:
@@ -173,14 +175,14 @@ def create_ngrams(img, height, width, length=4, ocr_engine='pytesseract'):
 
 def normalize(text, key):
     if key == 'amount':
-        text = text.replace(",", '')
-        splits = text.split('.')
+        text = text.replace(" ", '')
+        splits = text.split(',')
         if len(splits) == 1:
-            text += ".00"
+            text += ",00"
         else:
-            text = splits[0] + '.' + splits[1][:2]
+            text = splits[0] + ',' + splits[1][:2]
     else:
         matches = [date for date in datefinder.find_dates(text) if date <= datetime.datetime.today()]
         if matches:
-            text = matches[0].strftime('%m-%d-%Y')
+            text = matches[0].strftime(dateformat)
     return text

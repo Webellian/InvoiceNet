@@ -189,10 +189,6 @@ class InvoiceData(Data):
         pixels = (np.asarray(im, np.float32) / 255. - 0.5) * 2.
         return pixels
 
-    @staticmethod
-    def _preprocess_amount(value):
-        return '{:f}'.format(Decimal(value).normalize())
-
     def _load_document(self, doc_id):
         with open(doc_id, encoding="utf8") as fp:
             page = json.load(fp)
@@ -205,8 +201,6 @@ class InvoiceData(Data):
                                                                                                         page['width'])
 
         target = page['fields'][self.field]
-        if FIELDS[self.field] == FIELD_TYPES["amount"]:
-            target = self._preprocess_amount(target)
         target = InvoiceData.encode_sequence(target, self.seq_out[FIELDS[self.field]])
 
         return i, v, s, pixels, word_indices, pattern_indices, char_indices, memory_mask, parses, target
