@@ -22,6 +22,7 @@
 import os
 
 import tensorflow as tf
+from tqdm import tqdm
 
 from ..common.model import Model
 from .data import InvoiceData
@@ -111,7 +112,7 @@ class AttendCopyParse(Model):
             .batch(batch_size=1, drop_remainder=False)
 
         predictions = []
-        for sample in dataset:
+        for sample in tqdm(dataset, desc="predict {}".format(self.field), total=len(paths)):
             try:
                 logits = self.model(sample, training=False)
                 chars = tf.argmax(logits, axis=2, output_type=tf.int32).numpy()

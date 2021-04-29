@@ -39,21 +39,19 @@ class TextParser:
                                  r'\d{2,4}[\/\\\.\,-]\d{1,2}[\/\\\.\,-]\d{1,2}']
 
     def parse(self, text, key):
-        if key == 'date':
-            try:
-                matches = [date for date in datefinder.find_dates(text)]
-                if matches:
-                    return True
-                else:
-                    return False
-            except Exception:
-                return False
         if key not in self.template:
             return False
         for regex in self.template[key]:
-            if re.findall(regex, text):
-                return True
-        return False
+            if not re.findall(regex, text):
+                return False
+        if key == 'date':
+            try:
+                matches = [date for date in datefinder.find_dates(text)]
+                if not matches:
+                    return False
+            except Exception:
+                return False
+        return True
 
     def find(self, text, key):
         if key == 'date':
@@ -166,7 +164,7 @@ def create_ngrams(img, height, width, length=4, ocr_engine='pytesseract'):
         }
         if parser.parse(text=text, key='date'):
             ngram["parses"]["date"] = parser.find(text=text, key='date')[0]
-        elif parser.parse(text=text, key='amount'):
+        if parser.parse(text=text, key='amount'):
             ngram["parses"]["amount"] = parser.find(text=text, key='amount')[0]
         ngrams.append(ngram)
 
@@ -176,13 +174,14 @@ def create_ngrams(img, height, width, length=4, ocr_engine='pytesseract'):
 def normalize(text, key):
     if key == 'amount':
         text = text.replace(" ", '')
+        text = text.replace(".", ',')
         splits = text.split(',')
         if len(splits) == 1:
             text += ",00"
         else:
             text = splits[0] + ',' + splits[1][:2]
     else:
-        matches = [date for date in datefinder.find_dates(text) if date <= datetime.datetime.today()]
+        matches = [date for date in datefinder.find_dates(text)]
         if matches:
             text = matches[0].strftime(dateformat)
     return text

@@ -174,8 +174,8 @@ cd invoicenet/parsing
 python amount_generator.py
 python date_generator.py
 cd ../..
-python train_parser.py --field amount --batch_size 8 --steps 2000 --early_stop_steps 200
-python train_parser.py --field date --batch_size 8 --steps 2000 --early_stop_steps 200
+python train_parser.py --field amount --batch_size 8
+python train_parser.py --field date --batch_size 8
 ```
 
 ---
