@@ -29,6 +29,7 @@ from invoicenet.common.model import Model
 def train(model: Model,
           train_data: tf.data.Dataset,
           val_data: tf.data.Dataset,
+          val_non_batched_data: tf.data.Dataset=None,
           total_steps=50000,
           early_stop_steps=0):
 
@@ -38,6 +39,7 @@ def train(model: Model,
 
     train_iter = iter(train_data)
     val_iter = iter(val_data)
+    val_non_batched_iter = None if val_non_batched_data == None else iter(val_non_batched_data)
 
     start = time.time()
     for step in range(total_steps):
@@ -60,6 +62,8 @@ def train(model: Model,
                 print("Couldn't find any validation data! Have you prepared your training data?")
                 print("Terminating...")
                 break
+            if val_non_batched_iter != None:
+                print(model.val_predict(next(val_non_batched_iter)))
 
             print("[%d/%d | %.2f steps/s]: train loss: %.4f val loss: %.4f" % (
                 step, total_steps, (step + 1) / took, train_loss, val_loss))

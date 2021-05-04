@@ -52,12 +52,16 @@ def main():
     val_data = InvoiceData.create_dataset(field=args.field,
                                           data_dir=os.path.join(args.data_dir, 'val/'),
                                           batch_size=args.batch_size)
+    val_non_batched_data = InvoiceData.create_dataset(field=args.field,
+                                          data_dir=os.path.join(args.data_dir, 'val/'),
+                                          batch_size=None)
 
     print("Training...")
     trainer.train(
         model=AttendCopyParse(field=args.field, restore=args.restore),
         train_data=train_data,
         val_data=val_data,
+        val_non_batched_data=val_non_batched_data,
         total_steps=args.steps,
         early_stop_steps=args.early_stop_steps
     )
