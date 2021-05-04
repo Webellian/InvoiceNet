@@ -288,6 +288,8 @@ class InvoiceData(Data):
     @staticmethod
     def create_dataset(data_dir, field, batch_size):
         data = InvoiceData(field=field, data_dir=data_dir)
+        if batch_size == None:
+            batch_size = len(data.filenames)
         shapes, types = data.shapes(), data.types()
 
         def _transform(i, v, s, *args):

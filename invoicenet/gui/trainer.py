@@ -229,6 +229,11 @@ class Trainer(Frame):
             data_dir=os.path.join(self.args["prepared_data"], 'val/'),
             batch_size=self.args["batch_size"]
         )
+        val_non_batched_data = InvoiceData.create_dataset(
+            field=self.args["field"],
+            data_dir=os.path.join(self.args["prepared_data"], 'val/'),
+            batch_size=None
+        )
 
         restore = None
         if os.path.exists(os.path.join('./models/invoicenet/', self.args["field"])):
@@ -246,6 +251,7 @@ class Trainer(Frame):
 
         train_iter = iter(train_data)
         val_iter = iter(val_data)
+        val_non_batched_iter = iter(val_non_batched_data)
 
         self.logger.log("Initializing training!")
         start = time.time()
@@ -268,6 +274,7 @@ class Trainer(Frame):
                 took = time.time() - start
 
                 try:
+                    self.logger.log(model.val_predict(next(val_non_batched_iter)))
                     val_loss = model.val_step(next(val_iter))
                 except StopIteration:
                     self.logger.log("Couldn't find any validation data! Have you prepared your training data?")

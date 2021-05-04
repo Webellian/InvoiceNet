@@ -23,6 +23,7 @@ import os
 
 import tensorflow as tf
 from tqdm import tqdm
+import numpy as np
 
 from ..common.model import Model
 from .data import InvoiceData
@@ -96,6 +97,22 @@ class AttendCopyParse(Model):
         predictions = self.model(inputs, training=False)
         loss = self.loss_func(targets, predictions)
         return loss
+
+    @tf.function
+    def val_predict_graph(self, inputs, training):
+        return self.model(inputs, training=training)
+
+    def val_predict(self, inputs):
+        data = InvoiceData(field=self.field)
+        inputs, targets = inputs[:-1], inputs[-1]
+        logits = self.val_predict_graph(inputs, training=False)
+        chars = tf.argmax(logits, axis=2, output_type=tf.int32).numpy()
+        predicted = data.array_to_str(chars)
+        target_str = data.array_to_str(targets.numpy())
+        accuracy = (np.array(predicted) == np.array(target_str)).mean()
+        non_matched_results = "\n".join("{} vs {} (index: {})".format(p, t, index) \
+            for index, (p, t) in enumerate(zip(predicted, target_str)) if p != t)
+        return "val accuracy: {:.1%}\n{}".format(accuracy, non_matched_results)
 
     def predict(self, paths):
         data = InvoiceData(field=self.field)
