@@ -22,6 +22,7 @@
 import time
 import numpy as np
 import tensorflow as tf
+from datetime import datetime
 
 from invoicenet.common.model import Model
 
@@ -39,10 +40,20 @@ def train(model: Model,
     train_iter = iter(train_data)
     val_iter = iter(val_data)
 
+    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    logdir = './logs/func/%s' % stamp
+    writer = tf.summary.create_file_writer(logdir)
+
     start = time.time()
     for step in range(total_steps):
         try:
+            tf.summary.trace_on(graph=True, profiler=False)
             train_loss = model.train_step(next(train_iter))
+            with writer.as_default():
+                tf.summary.trace_export(
+                    name="model.train_step",
+                    step=step,
+                    profiler_outdir=logdir)
         except StopIteration:
             print("Couldn't find any training data! Have you prepared your training data?")
             print("Terminating...")

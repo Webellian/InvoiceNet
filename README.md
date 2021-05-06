@@ -232,6 +232,10 @@ python predict.py --field total_amount --data_dir predict_data/
 ```
 ---
 
+## TensorBoard
+Run the following command and open TensorBoard in a browser
+```tensorboard --logdir='./logs'```
+
 ## Reference
 This implementation is largely based on the work of R. Palm et al, who should be cited if this is used in a scientific publication (or the preceding conference papers):
 
