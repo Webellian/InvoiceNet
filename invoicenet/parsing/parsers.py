@@ -54,7 +54,7 @@ class OptionalParser(Parser):
         super(OptionalParser, self).__init__()
         self.seq_out = seq_out
         self.delegate = delegate
-        self.dense_1 = tf.keras.layers.Dense(1)
+        self.dense_1 = tf.keras.layers.Dense(1, activation=tf.keras.activations.sigmoid)
 
     def restore(self):
         return self.delegate.restore()
@@ -65,7 +65,7 @@ class OptionalParser(Parser):
         empty_answer = tf.fill([tf.shape(x)[0], self.seq_out], InvoiceData.eos_idx)
         empty_answer = tf.one_hot(empty_answer, InvoiceData.n_output)  # (bs, seq_out, n_out)
         logit_empty = self.dense_1(context)  # (bs, 1)
-        return parsed + tf.expand_dims(logit_empty, axis=2) * empty_answer
+        return tf.expand_dims(1.0 - logit_empty, axis=2) * parsed + tf.expand_dims(logit_empty, axis=2) * empty_answer
 
 
 class AmountParser(Parser):
