@@ -73,10 +73,25 @@ class AttendCopyParse(Model):
             self.checkpoint.read(self.restore_all_path).expect_partial()
 
     def loss_func(self, y_true, y_pred):
+        def soft_min(x, y):
+            """
+            Differentiable minimum
+            """
+            epsilon = 0.001
+            return 0.5 * (x + y - tf.math.sqrt(epsilon + tf.math.square(x - y)))
+
         mask = tf.cast(tf.logical_not(tf.equal(y_true, InvoiceData.pad_idx)), dtype=tf.float32)  # (bs, seq)
         label_cross_entropy = tf.reduce_sum(
             self.loss_object(y_true, y_pred) * mask, axis=1) / tf.reduce_sum(mask, axis=1)
-        field_loss = tf.reduce_mean(label_cross_entropy)
+
+        penalty_for_optionality = tf.math.reduce_max(label_cross_entropy) * 0.5
+        empty_answer = tf.fill(tf.shape(y_true), InvoiceData.eos_idx)
+        empty_cross_entropy = tf.reduce_sum(
+            self.loss_object(empty_answer, y_pred) * mask, axis=1) / tf.reduce_sum(mask, axis=1) + penalty_for_optionality
+
+        combines_cross_entropy = soft_min(label_cross_entropy, empty_cross_entropy)
+
+        field_loss = tf.reduce_mean(combines_cross_entropy)
         loss = field_loss + sum(self.model.losses)
         return loss
 
