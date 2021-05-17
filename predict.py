@@ -25,6 +25,7 @@ import argparse
 
 from invoicenet import FIELDS
 from invoicenet.acp.acp import AttendCopyParse
+from invoicenet.acp.data import InvoiceData
 
 
 def main():
@@ -67,10 +68,11 @@ def main():
             else:
                 print("Could not find a trained model for field '{}', skipping...".format(field))
 
+    processed_pdfs = InvoiceData.preprocess_pdfs(paths=paths)
     for field in fields:
         print("\nExtracting field '{}' from {} invoices...\n".format(field, len(paths)))
         model = AttendCopyParse(field=field, restore=True)
-        predictions[field] = model.predict(paths=paths)
+        predictions[field] = model.predict(processed_pdfs=processed_pdfs)
 
     os.makedirs(args.pred_dir, exist_ok=True)
     for idx, filename in enumerate(paths):

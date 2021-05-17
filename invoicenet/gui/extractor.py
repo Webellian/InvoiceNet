@@ -33,6 +33,7 @@ from wand.exceptions import WandException
 
 from .. import FIELDS
 from ..acp.acp import AttendCopyParse
+from ..acp.data import InvoiceData
 from .custom_widgets import MenuBox, HoverButton, Logger, StoppableThread
 from .help_box import HelpBox
 from .viewer import PDFViewer
@@ -277,11 +278,12 @@ class Extractor(Frame):
             temp.write(pdf)
             path = temp.name
 
+        processed_pdfs = InvoiceData.preprocess_pdfs(paths=[path])
         predictions = {}
         for key in FIELDS:
             if self.checkboxes[key].get():
                 model = AttendCopyParse(field=key, restore=True)
-                predictions[key] = model.predict(paths=[path])[0]
+                predictions[key] = model.predict(processed_pdfs=processed_pdfs)[0]
 
         if temp is not None:
             temp.close()

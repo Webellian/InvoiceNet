@@ -28,17 +28,16 @@ import multiprocessing as mp
 
 from invoicenet import FIELDS, FIELD_TYPES
 from invoicenet.common import util
+from invoicenet.acp.data import InvoiceData
 
 
 def process_file(filename, out_dir, phase, ocr_engine):
     try:
-        page = pdf2image.convert_from_path(filename)[0]
+        page, ngrams = InvoiceData.pdf_to_ngrams(filename, ocr_engine=ocr_engine)
         page.save(os.path.join(out_dir, phase, os.path.basename(filename)[:-3] + 'png'))
-
         height = page.size[1]
         width = page.size[0]
 
-        ngrams = util.create_ngrams(page, height=height, width=width, ocr_engine=ocr_engine)
         for ngram in ngrams:
             if "amount" in ngram["parses"]:
                 ngram["parses"]["amount"] = util.normalize(ngram["parses"]["amount"], key="amount")

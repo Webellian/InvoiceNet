@@ -96,7 +96,7 @@ class AttendCopyParse(Model):
         loss = self.loss_func(targets, predictions)
         return loss
 
-    def predict(self, paths):
+    def predict(self, processed_pdfs):
         data = InvoiceData(field=self.field)
         shapes, types = data.shapes()[:-1], data.types()[:-1]
 
@@ -104,14 +104,14 @@ class AttendCopyParse(Model):
             return (tf.SparseTensor(i, v, s),) + args
 
         dataset = tf.data.Dataset.from_generator(
-            data.generate_test_data(paths),
+            data.generate_test_data(processed_pdfs),
             types,
             shapes
         ).map(_transform) \
             .batch(batch_size=1, drop_remainder=False)
 
         predictions = []
-        for sample in dataset:
+        for sample in tqdm(dataset, desc="predict {}".format(self.field), total=len(processed_pdfs)):
             try:
                 logits = self.model(sample, training=False)
                 chars = tf.argmax(logits, axis=2, output_type=tf.int32).numpy()

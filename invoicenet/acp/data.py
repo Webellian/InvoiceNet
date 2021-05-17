@@ -31,6 +31,7 @@ import numpy as np
 import tensorflow as tf
 from PIL import Image
 from decimal import Decimal
+from tqdm import tqdm
 
 from .. import FIELDS, FIELD_TYPES
 from ..common import util
@@ -240,12 +241,22 @@ class InvoiceData(Data):
                 print("Exception: {} : {}".format(doc_id, exp))
                 exceptions += 1
 
-    def _process_pdf(self, path):
+    @staticmethod
+    def pdf_to_ngrams(path, ocr_engine=None):
         pixels = pdf2image.convert_from_path(path)[0]
         height = pixels.size[1]
         width = pixels.size[0]
+        ngrams = util.create_ngrams(pixels, height, width, ocr_engine=ocr_engine)
+        return pixels, ngrams
 
-        ngrams = util.create_ngrams(pixels, height, width)
+    @staticmethod
+    def preprocess_pdfs(paths):
+        processed_pdfs = []
+        for path in tqdm(paths, desc="process pdf {}", total=len(paths)):
+            processed_pdfs.append((path,) + InvoiceData.pdf_to_ngrams(path))
+        return processed_pdfs
+
+    def _process_pdf(self, path, pixels, ngrams):
         for ngram in ngrams:
             if "amount" in ngram["parses"]:
                 ngram["parses"]["amount"] = util.normalize(ngram["parses"]["amount"], key="amount")
@@ -254,8 +265,8 @@ class InvoiceData(Data):
 
         page = {
             "nGrams": ngrams,
-            "height": height,
-            "width": width,
+            "height": pixels.size[1],
+            "width": pixels.size[0],
             "filename": path
         }
 
@@ -270,15 +281,15 @@ class InvoiceData(Data):
 
         return i, v, s, pixels, word_indices, pattern_indices, char_indices, memory_mask, parses
 
-    def generate_test_data(self, paths: list):
-        if not isinstance(paths, list):
-            raise Exception("This function assumes the input is a list of paths")
+    def generate_test_data(self, processed_pdfs: list):
+        if not isinstance(processed_pdfs, list):
+            raise Exception("This function assumes the input is a list of processed_pdfs")
 
         def _generator():
             exceptions = 0
-            for idx, path in enumerate(paths):
+            for path, pixels, ngrams in processed_pdfs:
                 try:
-                    yield self._process_pdf(path)
+                    yield self._process_pdf(path, pixels, ngrams)
                 except Exception as exp:
                     print("Exception: {} : {}".format(path, exp))
                     exceptions += 1
