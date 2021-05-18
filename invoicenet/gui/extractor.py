@@ -54,6 +54,7 @@ class Extractor(Frame):
         self.thread = None
         self.running = False
         self.save_dir = '.'
+        self.models = {}
         self._init_ui()
 
     def _init_ui(self):
@@ -282,8 +283,9 @@ class Extractor(Frame):
         predictions = {}
         for key in FIELDS:
             if self.checkboxes[key].get():
-                model = AttendCopyParse(field=key, restore=True)
-                predictions[key] = model.predict(processed_pdfs=processed_pdfs)[0]
+                if key not in self.models:
+                    self.models[key] = AttendCopyParse(field=key, restore=True)
+                predictions[key] = self.models[key].predict(processed_pdfs=processed_pdfs)[0]
 
         if temp is not None:
             temp.close()
