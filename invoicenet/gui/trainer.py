@@ -383,11 +383,11 @@ class Trainer(Frame):
         for phase, filenames in [('train', train_files), ('val', val_files)]:
             self.logger.log("Preparing {} data...".format(phase))
             for filename in tqdm(filenames):
-                page, ngrams = InvoiceData.pdf_to_ngrams(filename)
-                page.save(os.path.join(self.args["prepared_data"], phase, os.path.basename(filename)[:-3] + 'png'))
+                pixels, _, page = InvoiceData.pdf_to_ngrams(filename)
+                pixels.save(os.path.join(self.args["prepared_data"], phase, os.path.basename(filename)[:-3] + 'png'))
                 height = page.size[1]
                 width = page.size[0]
-                for ngram in ngrams:
+                for ngram in page["nGrams"]:
                     if "amount" in ngram["parses"]:
                         ngram["parses"]["amount"] = util.normalize(ngram["parses"]["amount"], key="amount")
                     if "date" in ngram["parses"]:
@@ -410,9 +410,9 @@ class Trainer(Frame):
 
                 data = {
                     "fields": fields,
-                    "nGrams": ngrams,
-                    "height": height,
-                    "width": width,
+                    "nGrams": page["nGrams"],
+                    "height": page["height"],
+                    "width": page["width"],
                     "filename": os.path.abspath(
                         os.path.join(self.args["prepared_data"], phase, os.path.basename(filename)[:-3] + 'png'))
                 }

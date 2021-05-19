@@ -241,22 +241,13 @@ class InvoiceData(Data):
                 print("Exception: {} : {}".format(doc_id, exp))
                 exceptions += 1
 
-    @staticmethod
-    def pdf_to_ngrams(path, ocr_engine=None):
+    @classmethod
+    def pdf_to_ngrams(cls, path, ocr_engine=None):
         pixels = pdf2image.convert_from_path(path)[0]
         height = pixels.size[1]
         width = pixels.size[0]
-        ngrams = util.create_ngrams(pixels, height, width, ocr_engine=ocr_engine)
-        return pixels, ngrams
+        ngrams = util.create_ngrams(path, pixels, height, width, ocr_engine=ocr_engine)
 
-    @staticmethod
-    def preprocess_pdfs(paths):
-        processed_pdfs = []
-        for path in tqdm(paths, desc="process pdf {}", total=len(paths)):
-            processed_pdfs.append((path,) + InvoiceData.pdf_to_ngrams(path))
-        return processed_pdfs
-
-    def _process_pdf(self, path, pixels, ngrams):
         for ngram in ngrams:
             if "amount" in ngram["parses"]:
                 ngram["parses"]["amount"] = util.normalize(ngram["parses"]["amount"], key="amount")
@@ -265,21 +256,29 @@ class InvoiceData(Data):
 
         page = {
             "nGrams": ngrams,
-            "height": pixels.size[1],
-            "width": pixels.size[0],
+            "height": height,
+            "width": width,
             "filename": path
         }
 
-        pixels = pixels.convert('RGB').resize(self.im_size[::-1], Image.ANTIALIAS)
-        pixels = (np.asarray(pixels, np.float32) / 255. - 0.5) * 2.
+        normalized_pixels = pixels.convert('RGB').resize(cls.im_size[::-1], Image.ANTIALIAS)
+        normalized_pixels = (np.asarray(normalized_pixels, np.float32) / 255. - 0.5) * 2.
 
-        n_grams = page['nGrams']
+        return pixels, normalized_pixels, page
 
-        word_indices, pattern_indices, char_indices, memory_mask, parses, i, v, s = self._encode_ngrams(n_grams,
+    @staticmethod
+    def preprocess_pdfs(paths):
+        processed_pdfs = []
+        for path in tqdm(paths, desc="process pdf {}", total=len(paths)):
+            processed_pdfs.append(InvoiceData.pdf_to_ngrams(path))
+        return processed_pdfs
+
+    def _process_pdf(self, normalized_pixels, page):
+        word_indices, pattern_indices, char_indices, memory_mask, parses, i, v, s = self._encode_ngrams(page['nGrams'],
                                                                                                         page['height'],
                                                                                                         page['width'])
 
-        return i, v, s, pixels, word_indices, pattern_indices, char_indices, memory_mask, parses
+        return i, v, s, normalized_pixels, word_indices, pattern_indices, char_indices, memory_mask, parses
 
     def generate_test_data(self, processed_pdfs: list):
         if not isinstance(processed_pdfs, list):
@@ -287,11 +286,11 @@ class InvoiceData(Data):
 
         def _generator():
             exceptions = 0
-            for path, pixels, ngrams in processed_pdfs:
+            for _, normalized_pixels, page in processed_pdfs:
                 try:
-                    yield self._process_pdf(path, pixels, ngrams)
+                    yield self._process_pdf(normalized_pixels, page)
                 except Exception as exp:
-                    print("Exception: {} : {}".format(path, exp))
+                    print("Exception: {} : {}".format(page["filename"], exp))
                     exceptions += 1
 
         return _generator

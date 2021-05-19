@@ -33,12 +33,10 @@ from invoicenet.acp.data import InvoiceData
 
 def process_file(filename, out_dir, phase, ocr_engine):
     try:
-        page, ngrams = InvoiceData.pdf_to_ngrams(filename, ocr_engine=ocr_engine)
-        page.save(os.path.join(out_dir, phase, os.path.basename(filename)[:-3] + 'png'))
-        height = page.size[1]
-        width = page.size[0]
+        pixels, _, page = InvoiceData.pdf_to_ngrams(filename, ocr_engine=ocr_engine)
+        pixels.save(os.path.join(out_dir, phase, os.path.basename(filename)[:-3] + 'png'))
 
-        for ngram in ngrams:
+        for ngram in page["nGrams"]:
             if "amount" in ngram["parses"]:
                 ngram["parses"]["amount"] = util.normalize(ngram["parses"]["amount"], key="amount")
             if "date" in ngram["parses"]:
@@ -61,9 +59,9 @@ def process_file(filename, out_dir, phase, ocr_engine):
 
         data = {
             "fields": fields,
-            "nGrams": ngrams,
-            "height": height,
-            "width": width,
+            "nGrams": page["nGrams"],
+            "height": page["height"],
+            "width": page["width"],
             "filename": os.path.abspath(
                 os.path.join(out_dir, phase, os.path.basename(filename)[:-3] + 'png'))
         }
