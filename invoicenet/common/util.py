@@ -26,7 +26,8 @@ import datetime
 import datefinder
 import pytesseract
 from pytesseract import Output
-
+from pdfminer.high_level import extract_pages
+from pdfminer.layout import LTTextContainer, LTTextLine, LTChar, LTAnno
 
 class TextParser:
 
@@ -81,7 +82,47 @@ class TextParser:
         return text
 
 
-def extract_words(img, height, width, ocr_engine=None):
+def pdfminer_extract_words(line, page_height):
+    def dpi_scaling(value):
+        pdf2image_default_dpi = 200
+        pdfminer_default_dpi = 72
+        return int(value * pdf2image_default_dpi / pdfminer_default_dpi)
+
+    words = []
+    word = LTTextContainer()
+    for char in line:
+        if isinstance(char, LTAnno) or char.get_text() == ' ':
+            if word.get_text():
+                words.append(word)
+            word = LTTextContainer()
+        else:
+            assert isinstance(char, LTChar)
+            word.add(char)
+    assert len(word) == 0
+
+    scaled_words = [
+        {
+            'text': word.get_text(),
+            'left': dpi_scaling(word.x0),
+            'top': dpi_scaling(page_height - word.y1),
+            'right': dpi_scaling(word.x1),
+            'bottom': dpi_scaling(page_height - word.y0)
+        }
+        for word in words
+    ]
+    return scaled_words
+
+def pdfminer_extract_lines(path):
+    for page_layout in extract_pages(path):
+        lines = []
+        for element in page_layout:
+            if isinstance(element, LTTextContainer):
+                for text_line in element:
+                    if isinstance(text_line, LTTextLine):
+                        lines.append(pdfminer_extract_words(text_line, page_layout.height))
+    return lines
+
+def extract_words_using_ocr(img, height, width, ocr_engine=None):
     if ocr_engine == None:
         ocr_engine = 'pytesseract'
     if ocr_engine == 'pytesseract':
@@ -151,9 +192,12 @@ def divide_into_lines(words, height, width):
     return lines
 
 
-def create_ngrams(img, height, width, length=4, ocr_engine='pytesseract'):
-    words = extract_words(img, height=height, width=width, ocr_engine=ocr_engine)
-    lines = divide_into_lines(words, height=img.size[1], width=img.size[0])
+def create_ngrams(path, img, height, width, length=4, ocr_engine=None):
+    if ocr_engine == 'pdfminer' or ocr_engine == None:
+        lines = pdfminer_extract_lines(path)
+    else:
+        words = extract_words_using_ocr(img, height=height, width=width, ocr_engine=ocr_engine)
+        lines = divide_into_lines(words, height=img.size[1], width=img.size[0])
     tokens = [line[i:i + N] for line in lines for N in range(1, length + 1) for i in range(len(line) - N + 1)]
     ngrams = []
     parser = TextParser()

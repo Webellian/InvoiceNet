@@ -86,8 +86,8 @@ def main():
                     help="validation split ration")
     ap.add_argument("--cores", type=int, help='Number of virtual cores to parallelize over',
                     default=max(1, (mp.cpu_count() - 2) // 2))  # To prevent IPC issues
-    ap.add_argument("--ocr_engine", type=str, default='pytesseract',
-                    help='OCR used to extract text', choices=['pytesseract', 'aws_textract'])
+    ap.add_argument("--ocr_engine", type=str, default='pdfminer',
+                    help='OCR used to extract text', choices=['pdfminer', 'pytesseract', 'aws_textract'])
 
     args = ap.parse_args()
 
