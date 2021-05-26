@@ -29,7 +29,7 @@ from invoicenet.acp.data import InvoiceData
 def main():
     ap = argparse.ArgumentParser()
 
-    ap.add_argument("--field", type=str, required=True, choices=["amount", "date"],
+    ap.add_argument("--field", type=str, required=True, choices=["amount", "date", "iban"],
                     help="field to train parser for")
     ap.add_argument("--batch_size", type=int, default=128,
                     help="batch size for training")
@@ -43,7 +43,7 @@ def main():
 
     args = ap.parse_args()
 
-    output_length = {"date": InvoiceData.seq_date, "amount": InvoiceData.seq_amount}[args.field]
+    output_length = {"date": InvoiceData.seq_date, "amount": InvoiceData.seq_amount, "iban": InvoiceData.seq_iban}[args.field]
 
     train_data = ParseData.create_dataset(
         path='invoicenet/parsing/data/%s/train.tsv' % args.field,

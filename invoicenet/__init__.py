@@ -22,7 +22,8 @@ FIELD_TYPES = {
     "general": 0,
     "optional": 1,
     "amount": 2,
-    "date": 3
+    "date": 3,
+    "iban": 4
 }
 
 FIELDS = dict()

@@ -60,11 +60,12 @@ class InvoiceData(Data):
         FIELD_TYPES["general"]: seq_long,
         FIELD_TYPES["optional"]: seq_long,
         FIELD_TYPES["amount"]: seq_amount,
-        FIELD_TYPES["date"]: seq_date
+        FIELD_TYPES["date"]: seq_date,
+        FIELD_TYPES["iban"]: seq_long
     }
 
     n_memories = 8
-    parses_idx = {'date': 0, 'amount': 1}
+    parses_idx = {'date': 0, 'amount': 1, 'iban': 2}
 
     def __init__(self, field, data_dir=None):
         self.field = field
@@ -253,6 +254,8 @@ class InvoiceData(Data):
                 ngram["parses"]["amount"] = util.normalize(ngram["parses"]["amount"], key="amount")
             if "date" in ngram["parses"]:
                 ngram["parses"]["date"] = util.normalize(ngram["parses"]["date"], key="date")
+            if "iban" in ngram["parses"]:
+                ngram["parses"]["iban"] = util.normalize(ngram["parses"]["iban"], key="iban")
 
         page = {
             "nGrams": ngrams,

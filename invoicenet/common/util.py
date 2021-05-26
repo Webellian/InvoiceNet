@@ -36,6 +36,7 @@ class TextParser:
         self.template['amount'] = [r'\d+[,\d]*\.\d+']
         self.template['date'] = [r'\d{1,2}[\/\\\.\,-]\d{1,2}[\/\\\.\,-]\d{2,4}',
                                  r'\d{2,4}[\/\\\.\,-]\d{1,2}[\/\\\.\,-]\d{1,2}']
+        self.template['iban'] = [r'(?:[A-Z]{2})?[A-Z0-9]{2}\s?(?:[A-Z0-9]{4}\s?){2,6}[A-Z0-9]{0,4}']
 
     def parse(self, text, key):
         if key == 'date':
@@ -72,6 +73,7 @@ class TextParser:
         values = list(set(values))
         return values
 
+    #TODO unused method?
     def replace(self, text, new, key):
         if key not in self.template:
             return text
@@ -212,6 +214,8 @@ def create_ngrams(path, img, height, width, length, ocr_engine=None):
             ngram["parses"]["date"] = parser.find(text=text, key='date')[0]
         elif parser.parse(text=text, key='amount'):
             ngram["parses"]["amount"] = parser.find(text=text, key='amount')[0]
+        if parser.parse(text=text, key='iban'):
+            ngram["parses"]["iban"] = parser.find(text=text, key='iban')[0]
         ngrams.append(ngram)
 
     return ngrams
@@ -225,8 +229,12 @@ def normalize(text, key):
             text += ".00"
         else:
             text = splits[0] + '.' + splits[1][:2]
-    else:
+    elif key == 'date':
         matches = [date for date in datefinder.find_dates(text) if date <= datetime.datetime.today()]
         if matches:
             text = matches[0].strftime('%m-%d-%Y')
+    elif key == 'iban':
+        text = text.replace(" ", "")
+    else:
+        raise KeyError(f"Unknown key: {key}")
     return text

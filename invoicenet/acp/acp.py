@@ -45,6 +45,8 @@ class AttendCopyParse(Model):
             parser = AmountParser()
         elif FIELDS[field] == FIELD_TYPES["date"]:
             parser = DateParser()
+        elif FIELDS[field] == FIELD_TYPES["iban"]:
+            parser = NoOpParser()
         else:
             parser = NoOpParser()
 

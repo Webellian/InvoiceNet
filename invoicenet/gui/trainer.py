@@ -392,6 +392,8 @@ class Trainer(Frame):
                         ngram["parses"]["amount"] = util.normalize(ngram["parses"]["amount"], key="amount")
                     if "date" in ngram["parses"]:
                         ngram["parses"]["date"] = util.normalize(ngram["parses"]["date"], key="date")
+                    if "iban" in ngram["parses"]:
+                        ngram["parses"]["iban"] = util.normalize(ngram["parses"]["iban"], key="iban")
 
                 with open(filename[:-3] + 'json', 'r') as fp:
                     labels = simplejson.loads(fp.read())
@@ -403,6 +405,8 @@ class Trainer(Frame):
                             fields[field] = util.normalize(labels[field], key="amount")
                         elif FIELDS[field] == FIELD_TYPES["date"]:
                             fields[field] = util.normalize(labels[field], key="date")
+                        if FIELDS[field] == FIELD_TYPES["iban"]:
+                            fields[field] = util.normalize(labels[field], key="iban")
                         else:
                             fields[field] = labels[field]
                     else:

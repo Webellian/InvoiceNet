@@ -121,6 +121,7 @@ There are 4 pre-defined field types:
 - **FIELD_TYPES["optional"]** : Optional fields that might not be present in all invoices.
 - **FIELD_TYPES["amount"]** : Fields that represent an amount.
 - **FIELD_TYPES["date"]** : Fields that represent a date.
+- **FIELD_TYPES["iban"]** : Fields that represent an International Bank Account Number.
 
 Choose the appropriate field type for the field and add the line mentioned below.
 
