@@ -63,7 +63,7 @@ class InvoiceData(Data):
         FIELD_TYPES["date"]: seq_date
     }
 
-    n_memories = 4
+    n_memories = 8
     parses_idx = {'date': 0, 'amount': 1}
 
     def __init__(self, field, data_dir=None):
@@ -96,7 +96,7 @@ class InvoiceData(Data):
             InvoiceData.im_size,  # pattern_indices
             InvoiceData.im_size,  # char_indices
             InvoiceData.im_size,  # memory_mask
-            InvoiceData.im_size + (self.n_memories, 2),  # parses
+            InvoiceData.im_size + (self.n_memories, len(self.parses_idx)),  # parses
             (InvoiceData.seq_out[FIELDS[self.field]],)  # target
         )
 
@@ -112,7 +112,7 @@ class InvoiceData(Data):
         char_indices = np.zeros(self.im_size, np.int32)
         memory_mask = np.zeros(self.im_size, np.float32)
 
-        parses = np.zeros(self.im_size + (self.n_memories, 2))
+        parses = np.zeros(self.im_size + (self.n_memories, len(self.parses_idx)))
         memory_indices = []
         for n_gram in n_grams:
             words = n_gram["words"]
@@ -246,7 +246,7 @@ class InvoiceData(Data):
         pixels = pdf2image.convert_from_path(path)[0]
         height = pixels.size[1]
         width = pixels.size[0]
-        ngrams = util.create_ngrams(path, pixels, height, width, ocr_engine=ocr_engine)
+        ngrams = util.create_ngrams(path, pixels, height, width, length=cls.n_memories, ocr_engine=ocr_engine)
 
         for ngram in ngrams:
             if "amount" in ngram["parses"]:

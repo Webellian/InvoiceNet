@@ -86,7 +86,7 @@ class AttendBlock(tf.keras.layers.Layer):
         # pattern_indices: (bs, h, w)
         # char_indices: (bs, h, w)
         # memory_mask: (bs, h, w, m, l, d)
-        # parses: (bs, h, w, 4, 2)
+        # parses: (bs, h, w, n_memories, len(parses))
 
         bs = tf.shape(pixels)[0]
         h, w = InvoiceData.im_size[0], InvoiceData.im_size[1]
@@ -111,7 +111,7 @@ class AttendBlock(tf.keras.layers.Layer):
         )
 
         pixels = tf.reshape(pixels, (bs, h, w, 3))
-        parses = tf.reshape(parses, (bs, h, w, InvoiceData.n_memories * 2))
+        parses = tf.reshape(parses, (bs, h, w, InvoiceData.n_memories * len(InvoiceData.parses_idx)))
         memory_mask = tf.reshape(memory_mask, (bs, h, w, 1))
         x = tf.concat([pixels, word_embeddings, pattern_embeddings, char_embeddings, parses, X, Y, memory_mask],
                       axis=3)

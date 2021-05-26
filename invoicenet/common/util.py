@@ -192,7 +192,7 @@ def divide_into_lines(words, height, width):
     return lines
 
 
-def create_ngrams(path, img, height, width, length=4, ocr_engine=None):
+def create_ngrams(path, img, height, width, length, ocr_engine=None):
     if ocr_engine == 'pdfminer' or ocr_engine == None:
         lines = pdfminer_extract_lines(path)
     else:
