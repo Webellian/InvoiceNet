@@ -39,15 +39,20 @@ class AttendCopyParse(Model):
         self.restore_all_path = './models/invoicenet/{}/best'.format(self.field) if restore else None
         os.makedirs("./models/invoicenet", exist_ok=True)
 
+
         if FIELDS[field] == FIELD_TYPES["optional"]:
             noop_parser = NoOpParser()
             parser = OptionalParser(noop_parser, 128)
+            from_logits = False
         elif FIELDS[field] == FIELD_TYPES["amount"]:
             parser = AmountParser()
+            from_logits = True
         elif FIELDS[field] == FIELD_TYPES["date"]:
             parser = DateParser()
+            from_logits = True
         else:
             parser = NoOpParser()
+            from_logits = False
 
         restore = parser.restore()
         if restore is not None:
@@ -57,7 +62,7 @@ class AttendCopyParse(Model):
         self.model = AttendCopyParseModel(parser=parser)
 
         self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy(
-            from_logits=True,
+            from_logits=from_logits,
             reduction=tf.keras.losses.Reduction.NONE)
 
         self.optimizer = tf.keras.optimizers.Nadam(learning_rate=3e-4)
