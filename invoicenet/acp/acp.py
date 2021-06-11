@@ -110,8 +110,16 @@ class AttendCopyParse(Model):
         predicted = data.array_to_str(chars)
         target_str = data.array_to_str(targets.numpy())
         accuracy = (np.array(predicted) == np.array(target_str)).mean()
-        non_matched_results = "\n".join("{} vs {} (index: {})".format(p, t, index) \
-            for index, (p, t) in enumerate(zip(predicted, target_str)) if p != t)
+
+        if FIELDS[self.field] in (FIELD_TYPES["amount"], FIELD_TYPES["date"]):
+            logits = tf.nn.softmax(logits, axis=2)
+        score = tf.math.top_k(logits, k=2)
+        confidence = score.values[:,:,0] - score.values[:,:,1]
+        mask = tf.cast(tf.logical_not(tf.equal(targets, InvoiceData.pad_idx)), dtype=tf.float32)
+        confidence_avg = tf.reduce_sum(confidence * mask, axis=1) / tf.reduce_sum(mask, axis=1)
+
+        non_matched_results = "\n".join("{} vs {} (confidence: {:.1%}, index: {})".format(p, t, c, index) \
+            for index, (p, t, c) in enumerate(zip(predicted, target_str, confidence_avg)) if p != t)
         return "val accuracy: {:.1%}\n{}".format(accuracy, non_matched_results)
 
     def predict(self, paths):
