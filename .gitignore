@@ -3,12 +3,16 @@
 .DS_Store
 invoicenet/acp/data/
 invoicenet/parsing/data/
+models/*
+!models/parsers
 */__pycache__/*
 env/
 data/
 predictions/
 processed_data/
 invoices/
+**/*.pdf
+**/*.json
 
 **/.vscode/
 *.swp

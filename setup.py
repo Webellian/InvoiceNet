@@ -244,7 +244,7 @@ try:
     device_info, nvcc_settings = inspect_cuda()
     cuda_version = device_info['cuda_version']
     
-    if cuda_version >= 11000:
+    if True or cuda_version >= 11000:
     	tensorflow_package = 'tensorflow-gpu==2.4.1'
     else:
     	tensorflow_package = 'tensorflow-gpu==2.3.0'
@@ -274,7 +274,7 @@ setuptools.setup(name='InvoiceNet',
                  packages=setuptools.find_packages(),
                  install_requires=[
                      tensorflow_package,
-                     "numpy~=1.19.2",
+                     "numpy",
                      "six~=1.15.0",
                      "datefinder==0.7.1",
                      "opencv-python==4.5.1.48",
