@@ -22,6 +22,7 @@ import os
 import glob
 import json
 import argparse
+from joblib import Parallel, delayed, parallel
 
 from invoicenet import FIELDS
 from invoicenet.acp.acp import AttendCopyParse
@@ -69,10 +70,18 @@ def main():
                 print("Could not find a trained model for field '{}', skipping...".format(field))
 
     processed_pdfs = InvoiceData.preprocess_pdfs(paths=paths)
-    for field in fields:
+
+    def predict_per_model(field, processed_pdfs):
         print("\nExtracting field '{}' from {} invoices...\n".format(field, len(paths)))
         model = AttendCopyParse(field=field, restore=True)
-        predictions[field] = model.predict(processed_pdfs=processed_pdfs)
+        return model.predict(processed_pdfs=processed_pdfs)
+
+    import time
+    start_time = time.time()
+    parallel_predictions = Parallel(n_jobs=1)(delayed(predict_per_model)(field=field, processed_pdfs=processed_pdfs) for field in fields)
+    for field, prediction in zip(fields, parallel_predictions):
+        predictions[field] = prediction
+    print("--- %s seconds ---" % (time.time() - start_time))
 
     os.makedirs(args.pred_dir, exist_ok=True)
     for idx, filename in enumerate(paths):
