@@ -28,6 +28,15 @@ import pytesseract
 from pytesseract import Output
 from pdfminer.high_level import extract_pages
 from pdfminer.layout import LTTextContainer, LTTextLine, LTChar, LTAnno
+import os
+from PIL import Image
+from googleapiclient.discovery import build
+import base64
+from google.cloud import vision
+
+## API keys for google ocr
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="google_api_keys.json"
+
 
 class TextParser:
 
@@ -140,6 +149,38 @@ def extract_words_using_ocr(img, height, width, ocr_engine=None):
         ]
         return words
 
+    
+    elif ocr_engine=='google_ocr':
+        img_byte_arr = io.BytesIO()
+        img.save(img_byte_arr, format='PNG')
+        img_byte_arr = img_byte_arr.getvalue()
+        client = vision.ImageAnnotatorClient()
+        content=img_byte_arr
+        image_ = vision.Image(content=content)
+        response = client.text_detection(image=image_)
+        texts = response.text_annotations
+
+        words=[]
+        first=True
+        for text in texts:
+            if first:
+                first=False
+                continue
+            data={}
+            data['text']=text.description
+            x_vert=[]
+            y_vert=[]
+            for vertex in text.bounding_poly.vertices:
+                x_vert.append(vertex.x)
+                y_vert.append(vertex.y)
+            data['left']=min(x_vert)
+            data['right']=max(x_vert)
+            data['top']=min(y_vert)
+            data['bottom']=max(y_vert)
+            words.append(data)
+        return words
+    
+    
     elif ocr_engine == 'aws_textract':
 
         import boto3
@@ -192,7 +233,7 @@ def divide_into_lines(words, height, width):
     return lines
 
 
-def create_ngrams(path, img, height, width, length, ocr_engine=None):
+def create_ngrams(path, img, height, width, length, ocr_engine=None):##change ocr_engine here while running predict.py  
     if ocr_engine == 'pdfminer' or ocr_engine == None:
         lines = pdfminer_extract_lines(path)
     else:
