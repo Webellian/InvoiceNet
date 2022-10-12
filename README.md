@@ -41,6 +41,21 @@ We have the tools to create the first publicly-available large-scale invoice dat
 
 To install InvoiceNet on Ubuntu, run the following commands:
 
+Install Python
+```bash
+sudo apt update && sudo apt-get install python3 python3-pip python3-virtualenv
+```
+
+Install CUDA
+- https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html
+- [Instruction for Ubuntu 22.04 64-bit](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_local)
+
+Run `nvidia-smi` to verify successful CUDA installation.
+```bash
+nvidia-smi
+```
+
+Install InvoiceNet
 ```bash
 git clone https://github.com/naiveHobo/InvoiceNet.git
 cd InvoiceNet/
