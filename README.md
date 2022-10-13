@@ -50,9 +50,12 @@ Install CUDA
 - https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html
 - [Instruction for Ubuntu 22.04 64-bit](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_local)
 
-Run `nvidia-smi` to verify successful CUDA installation.
+Run `nvidia-smi` and `nvcc` to verify successful CUDA installation.
 ```bash
-nvidia-smi
+sudo apt-get -y install nvidia-cuda-toolkit
+# you might need to reboot after that
+nvidia-smi  # if not found perhaps there's a problem related to: `Disable Secure Boot`
+nvcc --version
 ```
 
 Install InvoiceNet
@@ -129,7 +132,7 @@ To begin the data preparation process, click on the "Prepare Data" button in the
 
 
 ## Add Your Own Fields
-To add your own fields to InvoiceNet, open **invoicenet/\_\_init\_\_.py**.
+To add your own fields to InvoiceNet, open **[invoicenet/\_\_init\_\_.py](./invoicenet/__init__.py)**.
 
 There are 4 pre-defined field types:
 - **FIELD_TYPES["general"]** : General field like names, address, invoice number, etc.

@@ -246,8 +246,8 @@ try:
     cuda_version = device_info['cuda_version']
     
     if cuda_version >= 11000:
-        tensorflow_package = 'tensorflow-gpu==2.4.1'
-        numpy_package = 'numpy==1.19.2'
+        tensorflow_package = 'tensorflow-gpu==2.10.0'
+        numpy_package = 'numpy==1.23.0'
     else:
         tensorflow_package = 'tensorflow-gpu==2.3.0'
         numpy_package = 'numpy==1.18'
@@ -281,10 +281,12 @@ setuptools.setup(name='InvoiceNet',
                      numpy_package,
                      "six~=1.15.0",
                      "datefinder==0.7.1",
-                     "opencv-python==4.5.1.48",
+                     "google-api-python-client==2.64.0",
+                     "google-cloud-vision==3.1.4",
+                     "opencv-python==4.6.0.66",
                      "pdf2image==1.14.0",
                      "pdfplumber==0.5.27",
-                     "pdfminer.six==20191110",
+                     "pdfminer.six==20200517",
                      "PyPDF2==1.26.0",
                      "pytesseract==0.3.7",
                      "python-dateutil==2.8.1",
