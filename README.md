@@ -49,6 +49,11 @@ sudo apt update && sudo apt-get install python3 python3-pip python3-virtualenv
 Install CUDA
 - https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html
 - [Instruction for Ubuntu 22.04 64-bit](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=deb_local)
+- https://gretel.ai/blog/install-tensorflow-with-cuda-cdnn-and-gpu-support-in-4-easy-steps
+
+```bash
+sudo apt-get install --no-install-recommends nvidia-driver-450
+```
 
 Run `nvidia-smi` and `nvcc` to verify successful CUDA installation.
 ```bash
@@ -57,6 +62,14 @@ sudo apt-get -y install nvidia-cuda-toolkit
 nvidia-smi  # if not found perhaps there's a problem related to: `Disable Secure Boot`
 nvcc --version
 ```
+
+Run python and check GPU setup
+```python
+import tensorflow as tf
+print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+```
+
+----
 
 Install InvoiceNet
 ```bash
