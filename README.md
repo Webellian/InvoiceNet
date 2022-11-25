@@ -41,9 +41,20 @@ We have the tools to create the first publicly-available large-scale invoice dat
 
 To install InvoiceNet on Ubuntu, run the following commands:
 
-Install Python
+Install Python 3.8 (last version supporting TF 2.3)
 ```bash
-sudo apt update && sudo apt-get install python3 python3-pip python3-virtualenv
+#sudo apt update && sudo apt-get install python3 python3-pip python3-virtualenv
+# sudo apt install software-properties-common -y && sudo add-apt-repository ppa:deadsnakes/ppa -y && sudo apt update && sudo apt install python3.8 -y && sudo apt-get install -y python3-pip python3-virtualenv
+wget https://www.python.org/ftp/python/3.8.15/Python-3.8.15.tar.xz
+tar -xf Python-3.8.15.tar.xz
+sudo mv Python-3.8.15 /opt/
+sudo apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libsqlite3-dev libreadline-dev libffi-dev curl libbz2-dev pkg-config make -y
+cd /opt/Python-3.8.15/
+./configure --enable-optimizations --enable-shared
+make
+sudo make install
+sudo ldconfig /opt/Python-3.8.15
+python --version
 ```
 
 Install CUDA
@@ -52,13 +63,41 @@ Install CUDA
 - https://gretel.ai/blog/install-tensorflow-with-cuda-cdnn-and-gpu-support-in-4-easy-steps
 
 ```bash
-sudo apt-get install --no-install-recommends nvidia-driver-450
+sudo apt-get install linux-headers-$(uname -r)
+sudo apt-key del 7fa2af80
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
+sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
+wget https://developer.download.nvidia.com/compute/cuda/11.8.0/local_installers/cuda-repo-ubuntu2204-11-8-local_11.8.0-520.61.05-1_amd64.deb
+sudo dpkg -i cuda-repo-ubuntu2204-11-8-local_11.8.0-520.61.05-1_amd64.deb
+sudo cp /var/cuda-repo-ubuntu2204-11-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
+sudo apt-get update
+sudo apt-get -y install cuda
+sudo apt-get -y install nvidia-gds
+sudo reboot
 ```
+
+Post installation steps:
+- add `export PATH="/usr/local/cuda-11.8/bin:${PATH}"` to `~/.bashrc`
+
+Optional (old ideas / untested):
+```bash
+# sudo apt-get install --no-install-recommends nvidia-driver-450
+# sudo apt-get -y install nvidia-cuda-toolkit
+# you might need to reboot after that
+```
+
+Conda:
+```bash
+curl https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -o ~/miniconda.sh
+bash ~/miniconda.sh -p $HOME/miniconda
+bash
+conda create --name tf1 python=3.10 tensorflow
+conda activate tf1
+```
+
 
 Run `nvidia-smi` and `nvcc` to verify successful CUDA installation.
 ```bash
-sudo apt-get -y install nvidia-cuda-toolkit
-# you might need to reboot after that
 nvidia-smi  # if not found perhaps there's a problem related to: `Disable Secure Boot`
 nvcc --version
 ```

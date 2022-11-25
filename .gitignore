@@ -17,5 +17,5 @@ invoices/
 **/.vscode/
 *.swp
 **/*.egg-info/
-venv-*/
+venv*/
 build/
