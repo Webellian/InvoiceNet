@@ -78,6 +78,7 @@ sudo reboot
 
 Post installation steps:
 - add `export PATH="/usr/local/cuda-11.8/bin:${PATH}"` to `~/.bashrc`
+- add `export LD_LIBRARY_PATH=/usr/local/cuda-11.8/lib64:${LD_LIBRARY_PATH}"` to `~/.bashrc`
 
 Optional (old ideas / untested):
 ```bash
@@ -127,6 +128,14 @@ To be able to use InvoiceNet, you need to source the virtual environment that th
 # Source virtual environment
 source env/bin/activate
 ```
+
+#### Docker
+Steps to try:
+https://www.tensorflow.org/install/docker
+https://github.com/NVIDIA/nvidia-docker
+https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
+https://stackoverflow.com/questions/67045622/tensorflow-stream-executor-cuda-cuda-driver-cc328-failed-call-to-cuinit-cuda
+
 
 #### Windows 10
 
